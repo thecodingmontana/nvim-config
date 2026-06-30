@@ -34,8 +34,8 @@ map("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal insert mode" })
 map("n", "<leader>t1", "<cmd>1ToggleTerm<cr>", { desc = "Terminal 1" })
 map("n", "<leader>t2", "<cmd>2ToggleTerm<cr>", { desc = "Terminal 2" })
 map("n", "<leader>t3", "<cmd>3ToggleTerm<cr>", { desc = "Terminal 3" })
-map("n", "<leader>tn", "<cmd>ToggleTerm<cr>",  { desc = "New terminal" })
-map("n", "<leader>t",  "<cmd>ToggleTerm<cr>",  { desc = "Toggle terminal" })
+map("n", "<leader>tn", "<cmd>ToggleTerm<cr>",   { desc = "New terminal" })
+map("n", "<leader>t",  "<cmd>1ToggleTerm<cr>",  { desc = "Toggle terminal" })
 
 -- ── Telescope: LSP symbol search ────────────────────────────────
 map("n", "<leader>fs", "<cmd>Telescope lsp_workspace_symbols<cr>", { desc = "Workspace symbols" })
