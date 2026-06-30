@@ -181,7 +181,13 @@ return {
   {
     "lewis6991/gitsigns.nvim",
     event = "BufReadPost",
-    opts  = {},
+    opts  = {
+      current_line_blame = true,
+      current_line_blame_opts = {
+        delay = 300,
+        virt_text_pos = "eol",
+      },
+    },
   },
 
   -- ─── Trouble: diagnostics panel ───────────────────────────────────────
@@ -197,4 +203,234 @@ return {
 
   -- ─── JSON schema store ────────────────────────────────────────────────
   { "b0o/schemastore.nvim", lazy = true },
+
+  -- ─── inc-rename: rename with live preview ─────────────────────────────
+  {
+    "smjonas/inc-rename.nvim",
+    cmd = "IncRename",
+    config = function()
+      require("inc_rename").setup()
+    end,
+    keys = {
+      {
+        "<leader>rn",
+        function()
+          return ":IncRename " .. vim.fn.expand "<cword>"
+        end,
+        expr = true,
+        desc = "Rename symbol (live preview)",
+      },
+    },
+  },
+
+  -- ─── nvim-surround: change/add/delete quotes, brackets, tags ──────────
+  {
+    "kylechui/nvim-surround",
+    version = "*",
+    event   = "InsertEnter",
+    opts    = {},
+  },
+
+  -- ─── todo-comments: highlight + jump TODO/FIXME/HACK ──────────────────
+  {
+    "folke/todo-comments.nvim",
+    event = "BufReadPost",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+    keys = {
+      { "]t", function() require("todo-comments").jump_next() end, desc = "Next TODO" },
+      { "[t", function() require("todo-comments").jump_prev() end, desc = "Prev TODO" },
+      { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
+    },
+  },
+
+  -- ─── better-escape: exit insert mode with jk / jj ─────────────────────
+  {
+    "max397574/better-escape.nvim",
+    event = "InsertEnter",
+    opts = {
+      mapping = { "jk", "jj" },
+      timeout = 200,
+    },
+  },
+
+  -- ─── Harpoon2: instant jump to files you work in repeatedly ───────────
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local harpoon = require "harpoon"
+      harpoon:setup()
+
+      local map = vim.keymap.set
+      map("n", "<leader>ha", function() harpoon:list():add() end,            { desc = "Harpoon add file" })
+      map("n", "<leader>hh", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Harpoon menu" })
+      map("n", "<leader>h1", function() harpoon:list():select(1) end,        { desc = "Harpoon file 1" })
+      map("n", "<leader>h2", function() harpoon:list():select(2) end,        { desc = "Harpoon file 2" })
+      map("n", "<leader>h3", function() harpoon:list():select(3) end,        { desc = "Harpoon file 3" })
+      map("n", "<leader>h4", function() harpoon:list():select(4) end,        { desc = "Harpoon file 4" })
+    end,
+  },
+
+  -- ─── Spectre: project-wide find & replace ─────────────────────────────
+  {
+    "nvim-pack/nvim-spectre",
+    cmd = "Spectre",
+    keys = {
+      { "<leader>sr", "<cmd>lua require('spectre').toggle()<cr>", desc = "Find & Replace (Spectre)" },
+    },
+    opts = {},
+  },
+
+  -- ─── Diffview: proper git diff / merge UI ─────────────────────────────
+  {
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>",        desc = "Git diff view" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory<cr>", desc = "Git file history" },
+      { "<leader>gc", "<cmd>DiffviewClose<cr>",       desc = "Close diff view" },
+    },
+  },
+
+  -- ─── crates.nvim: Cargo.toml version completion & updates ─────────────
+  {
+    "saecki/crates.nvim",
+    event = "BufRead Cargo.toml",
+    opts = {
+      completion = {
+        cmp = { enabled = true },
+      },
+    },
+  },
+
+  -- ─── Auto-import / smarter TS completion ──────────────────────────────
+  -- typescript-tools gives faster, more reliable auto-import + organize
+  -- imports + inline type hints than plain ts_ls alone.
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+    opts = {
+      settings = {
+        expose_as_code_action = "all", -- adds "Add missing import" to code actions
+        tsserver_file_preferences = {
+          includeInlayParameterNameHints              = "all",
+          includeInlayFunctionParameterTypeHints       = true,
+          includeInlayVariableTypeHints                = true,
+          includeInlayPropertyDeclarationTypeHints     = true,
+          includeInlayFunctionLikeReturnTypeHints      = true,
+        },
+      },
+    },
+  },
+
+  -- ─── nvim-cmp: completion engine (auto-import suggestions, snippets) ──
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-nvim-lua",
+      "saadparwaiz1/cmp_luasnip",
+      "L3MON4D3/LuaSnip",
+    },
+    opts = function()
+      local cmp = require "cmp"
+      local luasnip = require "luasnip"
+      return {
+        snippet = {
+          expand = function(args) luasnip.lsp_expand(args.body) end,
+        },
+        mapping = cmp.mapping.preset.insert {
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<CR>"]      = cmp.mapping.confirm { select = true },
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+        },
+        sources = cmp.config.sources({
+          { name = "nvim_lsp" },
+          { name = "luasnip" },
+          { name = "nvim_lua" },
+        }, {
+          { name = "buffer" },
+          { name = "path" },
+        }),
+      }
+    end,
+  },
+
+  -- ─── Multi-cursor (VS Code style: Ctrl+n to add next match) ───────────
+  {
+    "mg979/vim-visual-multi",
+    branch = "master",
+    event  = "VeryLazy",
+  },
+
+  -- ─── LazyGit: full git UI inside nvim ──────────────────────────────────
+  {
+    "kdheepak/lazygit.nvim",
+    cmd = { "LazyGit" },
+    keys = {
+      { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
+    },
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
+  -- ─── mini.indentscope: highlights current block/function scope ────────
+  {
+    "echasnovski/mini.indentscope",
+    version = false,
+    event   = "BufReadPost",
+    opts = {
+      symbol  = "│",
+      options = { try_as_border = true },
+    },
+  },
+
+  -- ─── which-key: shows available keybindings on <leader> press ─────────
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {
+      preset = "modern",
+      delay  = 300,
+    },
+    config = function(_, opts)
+      local wk = require "which-key"
+      wk.setup(opts)
+      wk.add {
+        { "<leader>f",  group = "Find / Format" },
+        { "<leader>t",  group = "Terminal" },
+        { "<leader>x",  group = "Diagnostics / Close" },
+        { "<leader>c",  group = "Code Action" },
+        { "<leader>r",  group = "Rename" },
+        { "<leader>g",  group = "Git / Diff" },
+        { "<leader>h",  group = "Harpoon" },
+        { "<leader>s",  group = "Search / Replace" },
+        { "<leader>l",  group = "LazyGit" },
+        { "<leader>e",  desc  = "Focus file tree" },
+        { "<leader>d",  desc  = "Diagnostic float" },
+      }
+    end,
+  },
 }
