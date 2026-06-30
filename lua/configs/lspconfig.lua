@@ -18,7 +18,7 @@ local on_attach = function(_, bufnr)
   map("n", "gi",         vim.lsp.buf.implementation, "Implementation")
   map("n", "K",          vim.lsp.buf.hover,          "Hover Docs")
   map("n", "<leader>ca", vim.lsp.buf.code_action,    "Code Action")
-  map("n", "<leader>rn", vim.lsp.buf.rename,         "Rename Symbol")
+  -- Note: <leader>rn is mapped by inc-rename.nvim (live preview rename)
 end
 
 -- Default capabilities applied to all servers
@@ -45,7 +45,7 @@ local servers = {
   rust_analyzer = {
     settings = {
       ["rust-analyzer"] = {
-        checkOnSave = true,
+        checkOnSave = { command = "clippy" },
         cargo       = { allFeatures = true },
       },
     },
@@ -55,7 +55,9 @@ local servers = {
       on_attach(client, bufnr)
       vim.api.nvim_create_autocmd("BufWritePre", {
         buffer  = bufnr,
-        command = "EslintFixAll",
+        callback = function()
+          pcall(vim.cmd, "EslintFixAll")
+        end,
       })
     end,
   },
