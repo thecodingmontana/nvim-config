@@ -40,3 +40,22 @@ map("n", "<leader>t",  "<cmd>1ToggleTerm<cr>",  { desc = "Toggle terminal" })
 -- ── Telescope: LSP symbol search ────────────────────────────────
 map("n", "<leader>fs", "<cmd>Telescope lsp_workspace_symbols<cr>", { desc = "Workspace symbols" })
 map("n", "<leader>fS", "<cmd>Telescope lsp_document_symbols<cr>",  { desc = "Document symbols" })
+
+-- ── Imports (TS/JS/Vue) ───────────────────────────────────────
+map("n", "<leader>io", function()
+  vim.lsp.buf.execute_command {
+    command   = "_typescript.organizeImports",
+    arguments = { vim.api.nvim_buf_get_name(0) },
+  }
+end, { desc = "Organize imports" })
+
+map("n", "<leader>ia", function()
+  vim.lsp.buf.code_action()
+end, { desc = "Add missing import" })
+
+map("n", "<leader>iu", function()
+  vim.lsp.buf.execute_command {
+    command   = "_typescript.removeUnusedImports",
+    arguments = { vim.api.nvim_buf_get_name(0) },
+  }
+end, { desc = "Remove unused imports" })

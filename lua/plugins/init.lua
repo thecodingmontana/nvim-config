@@ -244,13 +244,16 @@ return {
     },
   },
 
-  -- ─── better-escape: exit insert mode with jk / jj ─────────────────────
+  -- ─── better-escape: exit insert mode with jk / jj (v2 API) ─────────────
   {
     "max397574/better-escape.nvim",
     event = "InsertEnter",
     opts = {
-      mapping = { "jk", "jj" },
-      timeout = 200,
+      default_mappings = false,
+      mappings = {
+        i = { j = { k = "<Esc>", j = "<Esc>" } },
+        v = { j = { k = "<Esc>" } },
+      },
     },
   },
 
@@ -430,7 +433,41 @@ return {
         { "<leader>l",  group = "LazyGit" },
         { "<leader>e",  desc  = "Focus file tree" },
         { "<leader>d",  desc  = "Diagnostic float" },
+        { "<leader>i",  group = "Imports" },
       }
     end,
+  },
+
+  -- ─── TypeScript import helpers (organize, add missing, remove unused) ─
+  -- Keymaps wired below; works alongside typescript-tools.nvim
+  {
+    "neovim/nvim-lspconfig",
+    keys = {
+      {
+        "<leader>io",
+        function()
+          vim.lsp.buf.execute_command {
+            command = "_typescript.organizeImports",
+            arguments = { vim.api.nvim_buf_get_name(0) },
+          }
+        end,
+        desc = "Organize imports",
+      },
+      {
+        "<leader>ia",
+        function() vim.lsp.buf.code_action() end,
+        desc = "Add missing imports (code action)",
+      },
+      {
+        "<leader>iu",
+        function()
+          vim.lsp.buf.execute_command {
+            command = "_typescript.removeUnusedImports",
+            arguments = { vim.api.nvim_buf_get_name(0) },
+          }
+        end,
+        desc = "Remove unused imports",
+      },
+    },
   },
 }
