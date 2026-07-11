@@ -66,3 +66,7 @@ for name, config in pairs(servers) do
     capabilities = capabilities,
   }, config))
 end
+
+-- Disable vue_ls / volar (crashing due to ts protocol issue)
+vim.lsp.enable("vue_ls", false)
+vim.lsp.enable("volar", false)

@@ -55,7 +55,7 @@ return {
         "eslint-lsp", "rust-analyzer",
         "emmet-ls", "bash-language-server",
         "yaml-language-server", "taplo",
-        "vue-language-server",
+        
         "prettier", "biome", "stylua", "shfmt",
       },
     },
