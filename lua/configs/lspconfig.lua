@@ -32,9 +32,6 @@ local servers = {
   yamlls      = {},
   taplo       = {},
   bashls      = {},
-  volar = {
-    init_options = {
-      vue = { hybridMode = true },
     },
     on_new_config = function(new_config, new_root_dir)
       local project_ts = new_root_dir .. '/node_modules/typescript/lib'
