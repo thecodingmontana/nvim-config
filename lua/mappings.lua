@@ -59,3 +59,17 @@ map("n", "<leader>iu", function()
     arguments = { vim.api.nvim_buf_get_name(0) },
   }
 end, { desc = "Remove unused imports" })
+
+-- ── Ctrl+click: go to definition (like VS Code) ───────────────────────────
+vim.keymap.set("n", "<C-LeftMouse>", function()
+  vim.lsp.buf.definition()
+end, { desc = "Go to definition (Ctrl+click)" })
+
+-- Also map gf to open file under cursor (for import paths)
+vim.keymap.set("n", "gf", function()
+  -- Try LSP definition first, fall back to file open
+  local ok = pcall(vim.lsp.buf.definition)
+  if not ok then
+    vim.cmd "normal! gf"
+  end
+end, { desc = "Go to file / definition" })

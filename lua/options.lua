@@ -56,3 +56,31 @@ vim.api.nvim_create_autocmd({ "TermOpen", "BufEnter" }, {
 
 -- Suppress nvim-lspconfig v2 deprecation warning
 vim.deprecate = function() end
+
+-- ── Diagnostics: inline errors like VS Code ───────────────────────────────
+vim.diagnostic.config {
+  -- Show error/warning text inline at end of line
+  virtual_text = {
+    prefix   = "●",   -- dot before message
+    spacing  = 4,
+    severity = { min = vim.diagnostic.severity.HINT },
+  },
+  -- Show signs in the gutter (E W I H)
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = " ",
+      [vim.diagnostic.severity.WARN]  = " ",
+      [vim.diagnostic.severity.INFO]  = " ",
+      [vim.diagnostic.severity.HINT]  = "󰌵 ",
+    },
+  },
+  underline        = true,   -- underline the offending code
+  update_in_insert = false,  -- don't distract while typing
+  severity_sort    = true,   -- errors first
+  float = {
+    border  = "rounded",
+    source  = true,          -- show which linter/LSP the error came from
+    header  = "",
+    prefix  = "",
+  },
+}

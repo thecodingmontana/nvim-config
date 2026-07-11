@@ -329,10 +329,10 @@ return {
     },
   },
 
-  -- ─── nvim-cmp: completion engine (auto-import suggestions, snippets) ──
+  -- ─── nvim-cmp: completion engine ─────────────────────────────────────────
   {
     "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
+    event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
@@ -340,17 +340,45 @@ return {
       "hrsh7th/cmp-nvim-lua",
       "saadparwaiz1/cmp_luasnip",
       "L3MON4D3/LuaSnip",
+      "onsails/lspkind.nvim",  -- VS Code-style icons in completion menu
     },
-    opts = function()
-      local cmp = require "cmp"
+    config = function()
+      local cmp     = require "cmp"
       local luasnip = require "luasnip"
-      return {
+      local lspkind = require "lspkind"
+
+      cmp.setup {
         snippet = {
           expand = function(args) luasnip.lsp_expand(args.body) end,
         },
+        window = {
+          completion    = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
+        },
+        formatting = {
+          format = lspkind.cmp_format {
+            mode        = "symbol_text",   -- show icon + text like VS Code
+            maxwidth    = 50,
+            ellipsis_char = "...",
+            -- show source name (LSP, Buffer, Path, Snippet)
+            before = function(entry, vim_item)
+              vim_item.menu = ({
+                nvim_lsp = "[LSP]",
+                luasnip  = "[Snip]",
+                buffer   = "[Buf]",
+                path     = "[Path]",
+                nvim_lua = "[Lua]",
+              })[entry.source.name]
+              return vim_item
+            end,
+          },
+        },
         mapping = cmp.mapping.preset.insert {
-          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-Space>"] = cmp.mapping.complete(),          -- trigger menu
+          ["<C-e>"]     = cmp.mapping.abort(),             -- close menu
           ["<CR>"]      = cmp.mapping.confirm { select = true },
+          ["<C-d>"]     = cmp.mapping.scroll_docs(4),
+          ["<C-u>"]     = cmp.mapping.scroll_docs(-4),
           ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_next_item()
@@ -369,15 +397,20 @@ return {
               fallback()
             end
           end, { "i", "s" }),
+          -- Arrow keys also work in menu
+          ["<Down>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
+          ["<Up>"]   = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
         },
         sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "nvim_lua" },
+          { name = "nvim_lsp", priority = 1000 },  -- LSP first (auto-imports here)
+          { name = "luasnip",  priority = 750 },
+          { name = "nvim_lua", priority = 500 },
         }, {
-          { name = "buffer" },
-          { name = "path" },
+          { name = "buffer",   priority = 250 },
+          { name = "path",     priority = 200 },
         }),
+        -- Auto-select first item so Enter always confirms
+        completion = { completeopt = "menu,menuone,noinsert" },
       }
     end,
   },
