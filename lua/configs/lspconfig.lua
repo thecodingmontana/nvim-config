@@ -32,7 +32,7 @@ local servers = {
   yamlls      = {},
   taplo       = {},
   bashls      = {},
-  volar       = {},
+  vue_ls      = {},
   tailwindcss = {
     filetypes = {
       "html", "css", "javascript", "javascriptreact",
