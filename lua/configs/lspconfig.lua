@@ -1,5 +1,4 @@
--- LSP config using vim.lsp.config (nvim 0.11+ native API)
--- Suppress nvim-lspconfig v2 deprecation warning
+-- LSP config
 vim.deprecate = function() end
 
 local capabilities = vim.tbl_deep_extend(
@@ -18,10 +17,8 @@ local on_attach = function(_, bufnr)
   map("n", "gi",         vim.lsp.buf.implementation, "Implementation")
   map("n", "K",          vim.lsp.buf.hover,          "Hover Docs")
   map("n", "<leader>ca", vim.lsp.buf.code_action,    "Code Action")
-  -- Note: <leader>rn is mapped by inc-rename.nvim (live preview rename)
 end
 
--- Default capabilities applied to all servers
 local lspconfig = require "lspconfig"
 
 local servers = {
@@ -32,15 +29,6 @@ local servers = {
   yamlls      = {},
   taplo       = {},
   bashls      = {},
-    },
-    on_new_config = function(new_config, new_root_dir)
-      local project_ts = new_root_dir .. '/node_modules/typescript/lib'
-      local mason_ts = vim.fn.expand('~/.local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib')
-      new_config.init_options.typescript = {
-        tsdk = vim.fn.isdirectory(project_ts) == 1 and project_ts or mason_ts,
-      }
-    end,
-  },
   tailwindcss = {
     filetypes = {
       "html", "css", "javascript", "javascriptreact",
@@ -53,19 +41,20 @@ local servers = {
   rust_analyzer = {
     settings = {
       ["rust-analyzer"] = {
-        checkOnSave = { command = "clippy" },
+        checkOnSave = true,
         cargo       = { allFeatures = true },
       },
     },
   },
   eslint = {
+    settings = {
+      experimental = { useFlatConfig = true },
+    },
     on_attach = function(client, bufnr)
       on_attach(client, bufnr)
       vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer  = bufnr,
-        callback = function()
-          pcall(vim.cmd, "EslintFixAll")
-        end,
+        buffer   = bufnr,
+        callback = function() pcall(vim.cmd, "EslintFixAll") end,
       })
     end,
   },
