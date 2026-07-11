@@ -33,14 +33,14 @@ local servers = {
   taplo       = {},
   bashls      = {},
   volar = {
+    init_options = {
+      vue = { hybridMode = true },
+    },
     on_new_config = function(new_config, new_root_dir)
-      -- Find TypeScript in project first, fall back to mason's typescript
-      local project_ts = new_root_dir .. "/node_modules/typescript/lib"
-      local mason_ts   = vim.fn.expand "~/.local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib"
-      new_config.init_options = {
-        typescript = {
-          tsdk = vim.fn.isdirectory(project_ts) == 1 and project_ts or mason_ts,
-        },
+      local project_ts = new_root_dir .. '/node_modules/typescript/lib'
+      local mason_ts = vim.fn.expand('~/.local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib')
+      new_config.init_options.typescript = {
+        tsdk = vim.fn.isdirectory(project_ts) == 1 and project_ts or mason_ts,
       }
     end,
   },
