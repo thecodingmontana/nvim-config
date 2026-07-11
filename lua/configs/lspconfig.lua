@@ -22,7 +22,20 @@ end
 local lspconfig = require "lspconfig"
 
 local servers = {
-  ts_ls       = {},
+  ts_ls = {
+    filetypes = {
+      'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue',
+    },
+    init_options = {
+      plugins = {
+        {
+          name = '@vue/typescript-plugin',
+          location = vim.fn.expand('~/.local/share/nvim/mason/packages/vue-language-server/node_modules/@vue/typescript-plugin'),
+          languages = { 'vue' },
+        },
+      },
+    },
+  },
   cssls       = {},
   html        = {},
   jsonls      = {},
